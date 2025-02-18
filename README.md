@@ -49,4 +49,4 @@ As demais bibliotecas utilizadas são bibliotecas disponibilizadas pela instala�
 ---
 
 Aqui encontra-se como o projeto foi e deve ser montado:
-![Esquemático do projeto](./esquema.png "Esquema do projeto")
+![Esquemático do projeto](./esquematico.png "Esquema do projeto")
