@@ -5,7 +5,6 @@
 #include <Adafruit_HMC5883_U.h>
 #include <BH1750.h>
 #include <DHT.h>
-#include <TinyGPS++.h>
 #include <ArduinoJson.h>
 #include <MQUnifiedsensor.h>
 #include <DallasTemperature.h>
@@ -81,12 +80,9 @@ DynamicJsonDocument docSend(1024);
 OneWire oneWire(PINO_ONEWIRE);
 DallasTemperature sensor(&oneWire);
 DeviceAddress endereco_temp;
-TinyGPSPlus gps;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
-void gpsAvailable();
-bool gpsDisplayInfo();
 void displayHeader(int pos);
 
 const unsigned char iconBitmap[] PROGMEM = {
@@ -159,8 +155,6 @@ const unsigned char iconBitmap[] PROGMEM = {
 void setup()
 {
   Serial.begin(9600);
-  Serial3.begin(9600);
-  Serial2.begin(9600);
   
   pinMode(redLed, OUTPUT);
   pinMode(greenLed, OUTPUT);
@@ -253,8 +247,7 @@ void setup()
 void loop()
 {
     digitalWrite(blueLed, HIGH);
-
-    gpsAvailable();
+    
     updateMqs();
     
     String body = "";
@@ -264,9 +257,6 @@ void loop()
     float uv = readUvIndex();
     float soilHumidity = getEarthHumidityPercentage();
     float luminosity = bh.readLightLevel();
-    float latitude = gps.location.lat();
-    float longitude = gps.location.lng();
-    float velocity = gps.speed.kmph();
     float pressure = bmp.readPressure();
     float alt = bmp.readAltitude();
     
@@ -365,9 +355,6 @@ void loop()
     docSend["umidade_solo"] = soilHumidity;
     docSend["pressao"] = pressure;
     docSend["altitude"] = alt;
-    docSend["latitude"] = latitude;
-    docSend["longitude"] = longitude;
-    docSend["velocidade"] = velocity;
     docSend["bussola"]["graus"] = pos;
     docSend["bussola"]["direcao"] = directionCompass;
 
@@ -466,16 +453,6 @@ void loop()
     Serial.print(F("Altitude: "));
     Serial.print(alt);
     Serial.println(F(" m"));
-
-    Serial.print(F("Latitude: "));
-    Serial.println(latitude);
-
-    Serial.print(F("Longitude: "));
-    Serial.println(longitude);
-
-    Serial.print(F("Velocidade: "));
-    Serial.print(velocity);
-    Serial.println(F(" km/h"));
 
     Serial.print(F("Bússola: "));
     Serial.print(pos);
